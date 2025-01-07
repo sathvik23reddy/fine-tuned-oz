@@ -44,13 +44,13 @@ def get_latest_video_links(channel_url, limit, scroll_duration):
     return video_links
 
 def push_to_csv(*data):
-    with open(outputCSVFile, mode='a', newline='') as file:
+    with open(outputCSVFile, mode='a', newline='', encoding='utf-8') as file:
         writer = csv.writer(file)
         writer.writerow(data)
 
 def setup_csv():
     columns = ["title", "description", "transcript"]
-    with open(outputCSVFile, mode='w', newline='') as file:
+    with open(outputCSVFile, mode='w', newline='', encoding='utf-8') as file:
         writer = csv.DictWriter(file, fieldnames=columns)
         writer.writeheader()
 
