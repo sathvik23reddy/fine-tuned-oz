@@ -12,12 +12,11 @@ import re
 
 
 def open_url_in_chrome(url, mode='headed'):
-    #print(f'Opening {url}')
     if mode == 'headed':
         driver = webdriver.Chrome()
     elif mode == 'headless':   
         options = webdriver.ChromeOptions()
-        options.add_argument('--headless')
+        options.add_argument("--headless=new")
         service = webdriver.chrome.service.Service(executable_path='./chromedriver.exe')
         driver = webdriver.chrome.webdriver.WebDriver(options=options, service=service)
     
@@ -25,18 +24,14 @@ def open_url_in_chrome(url, mode='headed'):
     return driver
 
 def accept_T_and_C(driver):
-    # Click 'No thanks'
-    driver.common.by(XPATH = "//paper-button[@aria-label='No thanks']").click()
-    
-    # Click 'I agree' https://stackoverflow.com/questions/64846902/how-to-get-rid-of-the-google-cookie-pop-up-with-my-selenium-automation
-    driver.switch_to.frame(driver.find_element_by_xpath("//iframe[contains(@src, 'consent.google.com')]"))
+    driver.find_elements(By.XPATH, "//paper-button[@aria-label='No thanks']").click()
+    driver.switch_to.frame(driver.find_elements(By.XPATH, "//iframe[contains(@src, 'consent.google.com')]"))
     sleep(1)
-    driver.find_element_by_xpath('//*[@id="introAgreeButton"]/span/span').click()
+    driver.find_elements(By.XPATH, '//*[@id="introAgreeButton"]/span/span').click()
     sleep(3)
     driver.refresh()
     
 def get_transcript(driver, mode):
-    
     driver.implicitly_wait(10)
     
     if mode=='headed':
@@ -51,12 +46,10 @@ def get_transcript(driver, mode):
         # Click 'More actions'
         driver.find_elements(By.XPATH, "//tp-yt-paper-button[@id='expand' and @role='button']")[0].click()
         
-        # sleep(3000)
+
         # Click 'Open transcript'
         wait = WebDriverWait(driver, 10)
         button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Show transcript']")))
-
-        # Click the button
         button.click()
     
     elif mode=='headless':
@@ -70,13 +63,14 @@ def get_transcript(driver, mode):
         
         # Click 'open transcript'
         try:
-            driver.find_element_by_xpath("//*[@id='items']/ytd-menu-service-item-renderer/tp-yt-paper-item").click()
+            wait = WebDriverWait(driver, 10)
+            button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Show transcript']")))
+            button.click()        
         except:
             sleep(3)
             driver.refresh()
             get_transcript(driver, mode)
     
-    # Get all transcript text
     print("Copying transcript ")
     transcript_element = driver.find_element(By.XPATH, "//*[@id='body']/ytd-transcript-segment-list-renderer")
     transcript = transcript_element.text
@@ -85,7 +79,7 @@ def get_transcript(driver, mode):
 
 def processTranscript(transcript):
     # Helps remove timestamps
-    pattern = r'^(0:\d{2}|00:\d{2}|00)$'
+    pattern = r'^(\d:\d{2}|\d{2}:\d{2}|\d{2})$'
 
     transcript = transcript.split('\n')
     transcript_text = list()
@@ -110,14 +104,14 @@ def main(url, mode='headless'):
     print('Saving transcript ')
     
     with open("output.txt", "w") as file:
-        file.write("".join(transcript))
+        file.write(" ".join(transcript))
     
     print("Transcript saved")
 
 if __name__ == '__main__':
-    url = "https://www.youtube.com/watch?v=5tvmMX8r_OM"
-    mode = 'headed'
-    main(url, mode)
+    url = "https://www.youtube.com/watch?v=6ARs_Qi-QUw"
+    # Supports 'headed' & 'headless' modes
+    main(url, 'headless')
     
 
     
