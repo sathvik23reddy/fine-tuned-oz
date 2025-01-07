@@ -3,7 +3,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import time
+import csv
 import yt_scrape
+
+outputCSVFile = 'output.csv'
 
 def get_latest_video_links(channel_url, limit, scroll_duration):
     """Extract video links from the given YouTube channel URL using Selenium."""
@@ -40,13 +43,24 @@ def get_latest_video_links(channel_url, limit, scroll_duration):
 
     return video_links
 
+def push_to_csv(*data):
+    with open(outputCSVFile, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(data)
+
+def setup_csv():
+    columns = ["title", "description", "transcript"]
+    with open(outputCSVFile, mode='w', newline='') as file:
+        writer = csv.DictWriter(file, fieldnames=columns)
+        writer.writeheader()
+
 def main(channel_url):
+    setup_csv()
     video_links = get_latest_video_links(channel_url, limit=50, scroll_duration=10)
-    print(f"Found {len(video_links)} videos:")
+    print(f"Found {len(video_links)} videos")
     for link in video_links:
-        print(yt_scrape.runIndividualScrape(link))
-        print("---------------------------------------------------------------")
-        
+        transcript, title, description = yt_scrape.runIndividualScrape(link) 
+        push_to_csv(title, description, transcript)      
 
 if __name__ == "__main__":
     channel_url = input("Enter YouTube channel URL: ").strip()

@@ -98,7 +98,7 @@ def runIndividualScrape(url, mode='headless'):
     	
     transcript = processTranscript(transcript)
 
-    print('Saving vidoe data')
+    print('Saving video data')
     
     return " ".join(transcript), title, description
     
