@@ -1,13 +1,9 @@
-import pandas as pd
 from time import sleep
-import os
+import re
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-import pprint
-import re
 
 
 
@@ -92,7 +88,8 @@ def processTranscript(transcript):
     return transcript_text
     
 
-def main(url, mode='headless'):
+def runIndividualScrape(url, mode='headless'):
+    # Supports 'headed' & 'headless' modes
     driver = open_url_in_chrome(url, mode)
     
     transcript = get_transcript(driver, mode)
@@ -103,15 +100,7 @@ def main(url, mode='headless'):
 
     print('Saving transcript ')
     
-    with open("output.txt", "w") as file:
-        file.write(" ".join(transcript))
-    
-    print("Transcript saved")
-
-if __name__ == '__main__':
-    url = "https://www.youtube.com/watch?v=6ARs_Qi-QUw"
-    # Supports 'headed' & 'headless' modes
-    main(url, 'headless')
+    return " ".join(transcript)
     
 
     

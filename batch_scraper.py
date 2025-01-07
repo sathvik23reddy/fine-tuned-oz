@@ -3,6 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 import time
+import yt_scrape
 
 def get_latest_video_links(channel_url, limit, scroll_duration):
     """Extract video links from the given YouTube channel URL using Selenium."""
@@ -43,7 +44,9 @@ def main(channel_url):
     video_links = get_latest_video_links(channel_url, limit=50, scroll_duration=10)
     print(f"Found {len(video_links)} videos:")
     for link in video_links:
-        print(link)
+        print(yt_scrape.runIndividualScrape(link))
+        print("---------------------------------------------------------------")
+        
 
 if __name__ == "__main__":
     channel_url = input("Enter YouTube channel URL: ").strip()
