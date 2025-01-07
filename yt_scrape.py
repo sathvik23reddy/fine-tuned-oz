@@ -5,8 +5,6 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-
-
 def open_url_in_chrome(url, mode='headed'):
     if mode == 'headed':
         driver = webdriver.Chrome()
@@ -27,9 +25,10 @@ def accept_T_and_C(driver):
     sleep(3)
     driver.refresh()
     
-def get_transcript(driver, mode):
+def get_video_data(driver, mode):
     driver.implicitly_wait(10)
-    
+    wait = WebDriverWait(driver, 10)
+
     if mode=='headed':
         try:
             print('Accepting Terms and Conditions')
@@ -55,23 +54,24 @@ def get_transcript(driver, mode):
         except:
             sleep(3)
             driver.refresh()
-            get_transcript(driver, mode)
+            get_video_data(driver, mode)
         
         # Click 'open transcript'
         try:
-            wait = WebDriverWait(driver, 10)
             button = wait.until(EC.element_to_be_clickable((By.XPATH, "//button[@aria-label='Show transcript']")))
             button.click()        
         except:
             sleep(3)
             driver.refresh()
-            get_transcript(driver, mode)
+            get_video_data(driver, mode)
     
     print("Copying transcript ")
     transcript_element = driver.find_element(By.XPATH, "//*[@id='body']/ytd-transcript-segment-list-renderer")
     transcript = transcript_element.text
+    title = driver.find_element(By.CSS_SELECTOR, 'h1.style-scope.ytd-watch-metadata yt-formatted-string').text
+    description = driver.find_element(By.CSS_SELECTOR, '#description-inline-expander > yt-attributed-string > span').text
 
-    return transcript
+    return transcript, title, description
 
 def processTranscript(transcript):
     # Helps remove timestamps
@@ -92,15 +92,14 @@ def runIndividualScrape(url, mode='headless'):
     # Supports 'headed' & 'headless' modes
     driver = open_url_in_chrome(url, mode)
     
-    transcript = get_transcript(driver, mode)
+    transcript, title, description = get_video_data(driver, mode)
     
     driver.close()
     	
     transcript = processTranscript(transcript)
 
-    print('Saving transcript ')
+    print('Saving vidoe data')
     
-    return " ".join(transcript)
+    return " ".join(transcript), title, description
     
 
-    
